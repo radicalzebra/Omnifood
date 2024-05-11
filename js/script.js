@@ -1,157 +1,144 @@
-console.log("Hello world!");
+const btnStart = document.querySelector(".start");
+const btnLearn = document.querySelector(".btn-learn");
+const form = document.querySelector("#form");
+const secHow = document.querySelector("#how");
+const header = document.querySelector(".header");
+const sectionHero = document.querySelector(".section-hero");
+const navLink = document.querySelectorAll(".nav-link");
 
-const myName = "Jonas Schmedtmann";
-const h1 = document.querySelector(".heading-primary");
-console.log(myName);
-console.log(h1);
+//sticky-nav
+const heroObserver = new IntersectionObserver(
+  function (entries, observer) {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) {
+        document.body.classList.add("sticky");
+      } else {
+        document.body.classList.remove("sticky");
+        navLink.forEach((link) => {
+          link.classList.remove("border-bottom");
+        });
+      }
+    });
+  },
+  {
+    root: null,
+    threshold: 0.05,
+    rootMargin: "-40px",
+  }
+);
 
-// h1.addEventListener("click", function () {
-//   h1.textContent = myName;
-//   h1.style.backgroundColor = "red";
-//   h1.style.padding = "5rem";
-// });
+heroObserver.observe(sectionHero);
 
-///////////////////////////////////////////////////////////
-// Set current year
-const yearEl = document.querySelector(".year");
-const currentYear = new Date().getFullYear();
-yearEl.textContent = currentYear;
-
-///////////////////////////////////////////////////////////
-// Make mobile navigation work
-
-const btnNavEl = document.querySelector(".btn-mobile-nav");
-const headerEl = document.querySelector(".header");
-
-btnNavEl.addEventListener("click", function () {
-  headerEl.classList.toggle("nav-open");
+//smooth-btn-scroll
+btnStart.addEventListener("click", function (e) {
+  e.preventDefault();
+  form.scrollIntoView({ behavior: "smooth" });
 });
 
-///////////////////////////////////////////////////////////
-// Smooth scrolling animation
+btnLearn.addEventListener("click", function (e) {
+  e.preventDefault();
+  how.scrollIntoView({ behavior: "smooth" });
+});
 
-const allLinks = document.querySelectorAll("a:link");
+//nav-scroll
+const nav = document.querySelector(".nav");
+nav.addEventListener("click", function (e) {
+  e.preventDefault();
+  if (e.target.classList.contains("nav-link")) {
+    const id = e.target.getAttribute("href");
+    document.querySelector(id).scrollIntoView({ behavior: "smooth" });
+    header.classList.remove("nav-open");
+  }
+});
+// Fade and Sec-border on nav
+const secobserver = new IntersectionObserver(
+  function (entries, observer) {
+    entries.forEach((entry) => {
+      const id = entry.target.getAttribute("id");
+      if (!entry.isIntersecting) {
+        return;
+      } else {
+        entry.target.classList.remove("fade");
+        navLink.forEach((link) => {
+          const linkid = link.getAttribute("href");
+          if (linkid === "#" + id) {
+            link.classList.add("border-bottom");
+          } else {
+            link.classList.remove("border-bottom");
+          }
+        });
+      }
+    });
+  },
+  {
+    root: null,
+    threshold: 0.15,
+    rootMargin: "20px",
+  }
+);
 
-allLinks.forEach(function (link) {
-  link.addEventListener("click", function (e) {
-    e.preventDefault();
-    const href = link.getAttribute("href");
+const sec = document.querySelectorAll(".section");
+sec.forEach((secs) => {
+  secobserver.observe(secs);
+  secs.classList.add("fade");
+});
 
-    // Scroll back to top
-    if (href === "#")
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
+//mobile-nav
+const btnOpen = document.querySelector(".btn-open");
+const btnClose = document.querySelector(".btn-close");
+const navOpen = function(e){
+  e.preventDefault();
+  nav.classList.add("nav-open");
+  btnClose.classList.add('nav-btn-open');
+  btnOpen.classList.add('nav-btn-close');
+};
 
-    // Scroll to other links
-    if (href !== "#" && href.startsWith("#")) {
-      const sectionEl = document.querySelector(href);
-      sectionEl.scrollIntoView({ behavior: "smooth" });
-    }
+const navCLose = function(e){
+  e.preventDefault();
+  nav.classList.remove("nav-open");
+  btnClose.classList.remove('nav-btn-open');
+  btnOpen.classList.remove('nav-btn-close');
+};
 
-    // Close mobile naviagtion
-    if (link.classList.contains("main-nav-link"))
-      headerEl.classList.toggle("nav-open");
+btnOpen.addEventListener("click", navOpen.bind());
+// btnClose.style.display = 'block';
+// btnOpen.style.display = 'none';
+  
+btnClose.addEventListener("click", navCLose.bind());
+// btnOpen.style.display = 'block';
+// btnClose.style.display = 'none';
+
+navLink.forEach(navs =>{
+  navs.addEventListener('click', function(e){
+    navCLose(e);
+  // btnOpen.style.display = 'block';
+  // btnClose.style.display = 'none';
   });
 });
 
-///////////////////////////////////////////////////////////
-// Sticky navigation
 
-const sectionHeroEl = document.querySelector(".section-hero");
+//year
+const now = new Date();
+const year = now.getFullYear();
+document.querySelector(".year").textContent = year;
 
-const obs = new IntersectionObserver(
-  function (entries) {
-    const ent = entries[0];
-    console.log(ent);
+//js hover event(nav)
+const handler = function (e) {
+  if (e.target.classList.contains("nav-link")) {
+    const link = e.target;
+    const logo = link.closest(".header").querySelector("img");
+    const sibling = link.closest(".header").querySelectorAll(".nav-link");
 
-    if (ent.isIntersecting === false) {
-      document.body.classList.add("sticky");
-    }
-
-    if (ent.isIntersecting === true) {
-      document.body.classList.remove("sticky");
-    }
-  },
-  {
-    // In the viewport
-    root: null,
-    threshold: 0,
-    rootMargin: "-80px",
-  }
-);
-obs.observe(sectionHeroEl);
-
-///////////////////////////////////////////////////////////
-// Fixing flexbox gap property missing in some Safari versions
-function checkFlexGap() {
-  var flex = document.createElement("div");
-  flex.style.display = "flex";
-  flex.style.flexDirection = "column";
-  flex.style.rowGap = "1px";
-
-  flex.appendChild(document.createElement("div"));
-  flex.appendChild(document.createElement("div"));
-
-  document.body.appendChild(flex);
-  var isSupported = flex.scrollHeight === 1;
-  flex.parentNode.removeChild(flex);
-  console.log(isSupported);
-
-  if (!isSupported) document.body.classList.add("no-flexbox-gap");
-}
-checkFlexGap();
-
-// https://unpkg.com/smoothscroll-polyfill@0.4.4/dist/smoothscroll.min.js
-
-/*
-.no-flexbox-gap .main-nav-list li:not(:last-child) {
-  margin-right: 4.8rem;
-}
-
-.no-flexbox-gap .list-item:not(:last-child) {
-  margin-bottom: 1.6rem;
-}
-
-.no-flexbox-gap .list-icon:not(:last-child) {
-  margin-right: 1.6rem;
-}
-
-.no-flexbox-gap .delivered-faces {
-  margin-right: 1.6rem;
-}
-
-.no-flexbox-gap .meal-attribute:not(:last-child) {
-  margin-bottom: 2rem;
-}
-
-.no-flexbox-gap .meal-icon {
-  margin-right: 1.6rem;
-}
-
-.no-flexbox-gap .footer-row div:not(:last-child) {
-  margin-right: 6.4rem;
-}
-
-.no-flexbox-gap .social-links li:not(:last-child) {
-  margin-right: 2.4rem;
-}
-
-.no-flexbox-gap .footer-nav li:not(:last-child) {
-  margin-bottom: 2.4rem;
-}
-
-@media (max-width: 75em) {
-  .no-flexbox-gap .main-nav-list li:not(:last-child) {
-    margin-right: 3.2rem;
+    sibling.forEach((sib) => {
+      if (sib !== link) {
+        sib.style.opacity = this;
+        logo.style.opacity = this;
+      }
+    });
   }
 }
+document.querySelector(".header").addEventListener("mouseover", handler.bind(.5));
+document.querySelector(".header").addEventListener("mouseout", handler.bind(1));
 
-@media (max-width: 59em) {
-  .no-flexbox-gap .main-nav-list li:not(:last-child) {
-    margin-right: 0;
-    margin-bottom: 4.8rem;
-  }
-}
-*/
+
+//sticky
